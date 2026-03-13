@@ -1,15 +1,20 @@
 package com.bishamon.todo.entity;
 
-import com.bishamon.todo.constant.UserStatus;
+import com.bishamon.todo.enumeration.UserStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.SuperBuilder;
 
 @Entity
-@Table(name = "user")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Table(name = "users")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@SuperBuilder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class User extends BaseEntity{
+public class User extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
@@ -26,7 +31,8 @@ public class User extends BaseEntity{
     @Column(name = "avatar_url", columnDefinition = "TEXT")
     String avatarUrl;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "VARCHAR(20) DEFAULT 'active'")
+    @Column(nullable = false, length = 20)
     UserStatus status = UserStatus.ACTIVE;
 }

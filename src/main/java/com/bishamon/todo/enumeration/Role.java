@@ -1,4 +1,4 @@
-package com.bishamon.todo.constant;
+package com.bishamon.todo.enumeration;
 
 public enum Role {
     OWNER, ADMIN, MEMBER, OBSERVER

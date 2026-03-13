@@ -1,6 +1,6 @@
 package com.bishamon.todo.entity;
 
-import com.bishamon.todo.constant.ActivityType;
+import com.bishamon.todo.enumeration.ActivityType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;

@@ -1,6 +1,6 @@
 package com.bishamon.todo.entity;
 
-import com.bishamon.todo.constant.Role;
+import com.bishamon.todo.enumeration.Role;
 import jakarta.persistence.*;
 import lombok.*;
 

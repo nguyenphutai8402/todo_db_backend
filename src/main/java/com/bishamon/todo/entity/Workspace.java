@@ -1,10 +1,12 @@
 package com.bishamon.todo.entity;
 
-import com.bishamon.todo.constant.Visibility;
+import com.bishamon.todo.enumeration.Visibility;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.SuperBuilder;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -13,7 +15,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@SuperBuilder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Workspace extends BaseEntity {
     @Id
@@ -26,14 +28,21 @@ public class Workspace extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     String description;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    Visibility visibility;
+    Visibility visibility = Visibility.PRIVATE;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by", nullable = false)
     User createdBy;
     //    Set<>
+    @Builder.Default
     @OneToMany(mappedBy = "workspace", cascade = CascadeType.ALL, orphanRemoval = true)
-    Set<WorkspaceMember> members;
+    Set<WorkspaceMember> members = new HashSet<>();
+
+    public void addMember(WorkspaceMember member){
+        member.setWorkspace(this);
+        this.members.add(member);
+    }
 }

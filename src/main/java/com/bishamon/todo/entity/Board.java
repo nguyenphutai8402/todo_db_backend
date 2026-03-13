@@ -1,6 +1,6 @@
 package com.bishamon.todo.entity;
 
-import com.bishamon.todo.constant.Visibility;
+import com.bishamon.todo.enumeration.Visibility;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -30,7 +30,7 @@ public class Board extends BaseEntity {
     private Visibility visibility;
 
     @Column(name = "is_archived")
-    private boolean isArchived;
+    private boolean isArchived = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
