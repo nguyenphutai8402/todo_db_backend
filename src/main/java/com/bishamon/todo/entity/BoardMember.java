@@ -1,6 +1,6 @@
 package com.bishamon.todo.entity;
 
-import com.bishamon.todo.enumeration.Role;
+import com.bishamon.todo.enumeration.ContextualRole;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -30,7 +30,8 @@ public class BoardMember {
     private User user;
 
     @Enumerated(EnumType.STRING)
-    private Role role;
+    @Column(name = "contextual_role", nullable = false, length = 20)
+    private ContextualRole contextualRole = ContextualRole.MEMBER;
 
     @Column(name = "joined_at")
     private LocalDateTime joinedAt;

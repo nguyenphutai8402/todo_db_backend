@@ -5,7 +5,7 @@ import com.bishamon.todo.dto.response.workspace.WorkspaceSummaryResponse;
 import com.bishamon.todo.entity.User;
 import com.bishamon.todo.entity.Workspace;
 import com.bishamon.todo.entity.WorkspaceMember;
-import com.bishamon.todo.enumeration.Role;
+import com.bishamon.todo.enumeration.ContextualRole;
 import com.bishamon.todo.enumeration.Visibility;
 import com.bishamon.todo.mapper.WorkspaceMapper;
 import com.bishamon.todo.repository.UserRepository;
@@ -40,7 +40,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
         WorkspaceMember ownerMember = WorkspaceMember.builder()
                 .user(currentUser)
-                .role(Role.OWNER)
+                .contextualRole(ContextualRole.OWNER)
                 .joinedAt(LocalDateTime.now())
                 .build();
         workspace.addMember(ownerMember);

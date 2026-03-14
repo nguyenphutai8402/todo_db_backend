@@ -1,6 +1,6 @@
 package com.bishamon.todo.entity;
 
-import com.bishamon.todo.enumeration.Role;
+import com.bishamon.todo.enumeration.ContextualRole;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -11,7 +11,11 @@ import java.time.LocalDateTime;
 @Table(name = "workspace_members", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"workspace_id", "user_id"})
 })
-@Data @NoArgsConstructor @AllArgsConstructor @Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class WorkspaceMember {
     @Id
@@ -27,8 +31,8 @@ public class WorkspaceMember {
     User user;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
-    Role role;
+    @Column(name = "contextual_role", nullable = false, length = 20)
+    ContextualRole contextualRole = ContextualRole.MEMBER;
 
     @Column(name = "joined_at", nullable = false)
     LocalDateTime joinedAt;

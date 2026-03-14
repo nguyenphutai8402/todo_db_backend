@@ -1,5 +1,6 @@
 package com.bishamon.todo.entity;
 
+import com.bishamon.todo.enumeration.GlobalRole;
 import com.bishamon.todo.enumeration.UserStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -35,4 +36,9 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     UserStatus status = UserStatus.ACTIVE;
+
+    @Builder.Default
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    GlobalRole globalRole = GlobalRole.USER;
 }

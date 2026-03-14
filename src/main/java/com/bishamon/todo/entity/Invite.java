@@ -1,6 +1,6 @@
 package com.bishamon.todo.entity;
 
-import com.bishamon.todo.enumeration.Role;
+import com.bishamon.todo.enumeration.ContextualRole;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -31,8 +31,8 @@ public class Invite {
     private String email;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Role role;
+    @Column(name = "contextual_role", nullable = false, length = 20)
+    private ContextualRole contextualRole = ContextualRole.MEMBER;
 
     @Column(nullable = false, unique = true)
     private String token;
