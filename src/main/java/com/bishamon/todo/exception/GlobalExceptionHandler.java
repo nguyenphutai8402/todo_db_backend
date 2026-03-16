@@ -2,7 +2,7 @@ package com.bishamon.todo.exception;
 
 import com.bishamon.todo.dto.response.common.ApiResponse;
 import com.bishamon.todo.dto.response.common.FieldError;
-import com.bishamon.todo.enumeration.ErrorCode;
+import com.bishamon.todo.enumeration.code.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -13,7 +13,6 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RestControllerAdvice

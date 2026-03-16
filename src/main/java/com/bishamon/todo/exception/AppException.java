@@ -1,6 +1,6 @@
 package com.bishamon.todo.exception;
 
-import com.bishamon.todo.enumeration.ErrorCode;
+import com.bishamon.todo.enumeration.code.ErrorCode;
 import lombok.Getter;
 
 @Getter

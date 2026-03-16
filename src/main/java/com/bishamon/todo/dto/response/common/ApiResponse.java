@@ -1,7 +1,7 @@
 package com.bishamon.todo.dto.response.common;
 
-import com.bishamon.todo.enumeration.ErrorCode;
-import com.bishamon.todo.enumeration.SuccessCode;
+import com.bishamon.todo.enumeration.code.ErrorCode;
+import com.bishamon.todo.enumeration.code.SuccessCode;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import lombok.experimental.FieldDefaults;

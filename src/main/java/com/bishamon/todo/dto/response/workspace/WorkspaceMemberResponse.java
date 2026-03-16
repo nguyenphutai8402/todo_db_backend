@@ -2,17 +2,19 @@ package com.bishamon.todo.dto.response.workspace;
 
 import com.bishamon.todo.dto.response.user.UserSummaryResponse;
 import com.bishamon.todo.enumeration.ContextualRole;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDateTime;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class WorkspaceMemberResponse {
-    private Long id;
-    private UserSummaryResponse user;
-    private ContextualRole contextualRole;
-    private LocalDateTime joinedAt;
-
+    Long id;
+    UserSummaryResponse user;
+    ContextualRole contextualRole;
+    LocalDateTime joinedAt;
 }

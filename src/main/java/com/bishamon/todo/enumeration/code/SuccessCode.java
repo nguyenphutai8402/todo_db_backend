@@ -1,4 +1,4 @@
-package com.bishamon.todo.enumeration;
+package com.bishamon.todo.enumeration.code;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
