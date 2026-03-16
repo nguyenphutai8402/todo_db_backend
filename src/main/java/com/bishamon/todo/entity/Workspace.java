@@ -10,7 +10,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "workspaces")
+@Table(name = "workspaces",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"name", "createdBy"}))
 @Getter
 @Setter
 @NoArgsConstructor
@@ -41,7 +42,7 @@ public class Workspace extends BaseEntity {
     @OneToMany(mappedBy = "workspace", cascade = CascadeType.ALL, orphanRemoval = true)
     Set<WorkspaceMember> members = new HashSet<>();
 
-    public void addMember(WorkspaceMember member){
+    public void addMember(WorkspaceMember member) {
         member.setWorkspace(this);
         this.members.add(member);
     }

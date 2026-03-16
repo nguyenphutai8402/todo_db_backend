@@ -30,10 +30,18 @@ public class WorkspaceMember {
     @JoinColumn(name = "user_id", nullable = false)
     User user;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(name = "contextual_role", nullable = false, length = 20)
     ContextualRole contextualRole = ContextualRole.MEMBER;
 
     @Column(name = "joined_at", nullable = false)
     LocalDateTime joinedAt;
+
+    @PrePersist
+    protected void onCreate(){
+        if(joinedAt == null) {
+            this.joinedAt = LocalDateTime.now();
+        }
+    }
 }

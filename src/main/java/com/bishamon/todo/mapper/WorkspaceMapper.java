@@ -20,8 +20,7 @@ public interface WorkspaceMapper {
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     Workspace toWorkspace(CreateWorkspaceRequest createWorkSpaceRequest);
-
-    @Mapping(target = "createdBy", source = "createdBy")
+    
     @Mapping(target = "memberCount", source = "members", qualifiedByName = "countMember")
     WorkspaceSummaryResponse toWorkSpaceSummaryResponse(Workspace workspace);
 

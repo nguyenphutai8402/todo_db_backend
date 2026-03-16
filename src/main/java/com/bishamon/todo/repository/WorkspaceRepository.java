@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface WorkspaceRepository extends JpaRepository<Workspace, Long> {
-    boolean existsByNameAndCreatedBy(String name, User createdBy);
+    boolean existsByCreatedByAndNameIgnoreCase(User createdBy, String name);
 }
