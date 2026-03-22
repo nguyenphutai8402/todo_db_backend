@@ -1,4 +1,4 @@
-package com.bishamon.todo.dto.response.workspace;
+package com.bishamon.todo.dto.response.workspace_member;
 
 import com.bishamon.todo.dto.response.user.UserSummaryResponse;
 import com.bishamon.todo.enumeration.ContextualRole;

@@ -1,8 +1,8 @@
 package com.bishamon.todo.mapper;
 
 import com.bishamon.todo.dto.request.CreateWorkspaceRequest;
-import com.bishamon.todo.dto.response.workspace.WorkspaceMemberResponse;
 import com.bishamon.todo.dto.response.workspace.WorkspaceDetailResponse;
+import com.bishamon.todo.dto.response.workspace.WorkspaceCreationResponse;
 import com.bishamon.todo.dto.response.workspace.WorkspaceSummaryResponse;
 import com.bishamon.todo.entity.Workspace;
 import com.bishamon.todo.entity.WorkspaceMember;
@@ -27,13 +27,10 @@ public interface WorkspaceMapper {
 
     // ============ RESPONSE============
     @Mapping(target = "memberCount", source = "members", qualifiedByName = "countMember")
-    WorkspaceSummaryResponse toWorkspaceSummaryResponse(Workspace workspace);
+    WorkspaceCreationResponse toWorkspaceCreationResponse(Workspace workspace);
 
-    @Mapping(target = "createdBy", source = "createdBy.id")
-    @Mapping(target = "memberCount", source = "members", qualifiedByName = "countMember")
-    @Mapping(source = "members", target = "members")
-    WorkspaceDetailResponse toWorkspaceDetailResponse(Workspace workspace);
-    List<WorkspaceDetailResponse> toWorkspaceDetailResponseList(List<Workspace> workspaces);
+    WorkspaceSummaryResponse toWorkspaceSummaryResponse(Workspace workspace);
+    List<WorkspaceSummaryResponse> toWorkspaceSummaryResponseList(List<Workspace> workspaces);
 
     @Named("countMember")
     default int countMember(Set<WorkspaceMember> members){

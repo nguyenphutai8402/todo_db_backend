@@ -2,6 +2,7 @@ package com.bishamon.todo.controller;
 
 import com.bishamon.todo.dto.request.CreateWorkspaceRequest;
 import com.bishamon.todo.dto.response.common.ApiResponse;
+import com.bishamon.todo.dto.response.workspace.WorkspaceCreationResponse;
 import com.bishamon.todo.dto.response.workspace.WorkspaceDetailResponse;
 import com.bishamon.todo.dto.response.workspace.WorkspaceSummaryResponse;
 import com.bishamon.todo.enumeration.code.SuccessCode;
@@ -24,16 +25,16 @@ public class WorkspaceController {
     WorkspaceService workspaceService;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<WorkspaceSummaryResponse>> create(
+    public ResponseEntity<ApiResponse<WorkspaceCreationResponse>> create(
             @RequestBody @Valid CreateWorkspaceRequest createWorkspaceRequest) {
-        WorkspaceSummaryResponse workspaceResponse = workspaceService.createWorkspace(createWorkspaceRequest);
+        WorkspaceCreationResponse workspaceResponse = workspaceService.createWorkspace(createWorkspaceRequest);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(ApiResponse.success(SuccessCode.CREATED, workspaceResponse));
     }
 
     @GetMapping("/my")
-    public ResponseEntity<ApiResponse<List<WorkspaceDetailResponse>>> getMy(){
+    public ResponseEntity<ApiResponse<List<WorkspaceSummaryResponse>>> getMy(){
         return ResponseEntity.ok(ApiResponse.ok(workspaceService.getMyWorkspaces()));
     }
 }

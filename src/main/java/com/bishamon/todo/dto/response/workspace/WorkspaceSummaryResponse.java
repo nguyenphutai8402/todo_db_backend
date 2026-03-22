@@ -1,27 +1,16 @@
 package com.bishamon.todo.dto.response.workspace;
 
-import com.bishamon.todo.dto.response.user.UserSummaryResponse;
-import com.bishamon.todo.enumeration.Visibility;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
-
-import java.time.LocalDateTime;
-import java.util.List;
+import lombok.experimental.FieldDefaults;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class WorkspaceSummaryResponse {
-    private Long id;
-    private String name;
-    private String description;
-    private Visibility visibility;
-    private UserSummaryResponse createdBy;
-    private int memberCount;
-    private LocalDateTime createdAt;
-    private LocalDateTime updateAt;
+    Long id;
+    String name;
+    String logoUrl;
 }
-

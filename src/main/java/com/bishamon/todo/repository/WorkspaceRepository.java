@@ -12,8 +12,9 @@ import java.util.List;
 @Repository
 public interface WorkspaceRepository extends JpaRepository<Workspace, Long> {
     boolean existsByCreatedByAndNameIgnoreCase(User createdBy, String name);
+
     @Query("""
-                select w from Workspace w 
+                select w from Workspace w
                 join WorkspaceMember wm on w.id = wm.workspace.id
                 where wm.user.id = :userId
             """)

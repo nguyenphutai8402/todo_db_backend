@@ -29,6 +29,9 @@ public class Workspace extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     String description;
 
+    @Column(name = "logo_url", columnDefinition = "TEXT")
+    String logoUrl;
+
     @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)

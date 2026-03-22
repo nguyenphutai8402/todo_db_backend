@@ -1,6 +1,7 @@
 package com.bishamon.todo.service.impl;
 
 import com.bishamon.todo.dto.request.CreateWorkspaceRequest;
+import com.bishamon.todo.dto.response.workspace.WorkspaceCreationResponse;
 import com.bishamon.todo.dto.response.workspace.WorkspaceDetailResponse;
 import com.bishamon.todo.dto.response.workspace.WorkspaceSummaryResponse;
 import com.bishamon.todo.entity.User;
@@ -34,7 +35,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
     @Override
     @Transactional
-    public WorkspaceSummaryResponse createWorkspace(CreateWorkspaceRequest createWorkSpaceRequest) {
+    public WorkspaceCreationResponse createWorkspace(CreateWorkspaceRequest createWorkSpaceRequest) {
         User currentUser = userRepository.findById(currentUserProvider.getCurrentUserId())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
@@ -55,12 +56,12 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
         Workspace savedWorkspace = workspaceRepository.save(workspace);
 
-        return workspaceMapper.toWorkspaceSummaryResponse(savedWorkspace);
+        return workspaceMapper.toWorkspaceCreationResponse(savedWorkspace);
     }
 
     @Override
-    public List<WorkspaceDetailResponse> getMyWorkspaces() {
+    public List<WorkspaceSummaryResponse> getMyWorkspaces() {
         List<Workspace> listWorkspace = workspaceRepository.findAllByUserId(currentUserProvider.getCurrentUserId());
-        return workspaceMapper.toWorkspaceDetailResponseList(listWorkspace);
+        return workspaceMapper.toWorkspaceSummaryResponseList(listWorkspace);
     }
 }
