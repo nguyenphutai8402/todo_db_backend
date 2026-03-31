@@ -3,6 +3,8 @@ package com.bishamon.todo.dto.response.workspace;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -13,4 +15,6 @@ public class WorkspaceSummaryResponse {
     Long id;
     String name;
     String logoUrl;
+    LocalDateTime createdAt;
+    LocalDateTime updatedAt;
 }

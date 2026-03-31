@@ -1,4 +1,4 @@
-package com.bishamon.todo.dto.request;
+package com.bishamon.todo.dto.request.workspace;
 
 import com.bishamon.todo.enumeration.Visibility;
 import jakarta.validation.constraints.NotBlank;

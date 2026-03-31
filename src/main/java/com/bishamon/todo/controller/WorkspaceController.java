@@ -1,9 +1,8 @@
 package com.bishamon.todo.controller;
 
-import com.bishamon.todo.dto.request.CreateWorkspaceRequest;
+import com.bishamon.todo.dto.request.workspace.CreateWorkspaceRequest;
 import com.bishamon.todo.dto.response.common.ApiResponse;
-import com.bishamon.todo.dto.response.workspace.WorkspaceCreationResponse;
-import com.bishamon.todo.dto.response.workspace.WorkspaceDetailResponse;
+import com.bishamon.todo.dto.response.workspace.CreateWorkspaceResponse;
 import com.bishamon.todo.dto.response.workspace.WorkspaceSummaryResponse;
 import com.bishamon.todo.enumeration.code.SuccessCode;
 import com.bishamon.todo.service.WorkspaceService;
@@ -25,9 +24,9 @@ public class WorkspaceController {
     WorkspaceService workspaceService;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<WorkspaceCreationResponse>> create(
+    public ResponseEntity<ApiResponse<CreateWorkspaceResponse>> create(
             @RequestBody @Valid CreateWorkspaceRequest createWorkspaceRequest) {
-        WorkspaceCreationResponse workspaceResponse = workspaceService.createWorkspace(createWorkspaceRequest);
+        CreateWorkspaceResponse workspaceResponse = workspaceService.createWorkspace(createWorkspaceRequest);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(ApiResponse.success(SuccessCode.CREATED, workspaceResponse));

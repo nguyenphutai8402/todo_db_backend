@@ -4,9 +4,7 @@ import com.bishamon.todo.entity.User;
 import com.bishamon.todo.enumeration.code.ErrorCode;
 import com.bishamon.todo.exception.AppException;
 import com.bishamon.todo.repository.UserRepository;
-import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 

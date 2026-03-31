@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class WorkspaceCreationResponse {
+public class CreateWorkspaceResponse {
     private Long id;
     private String name;
     private String description;
