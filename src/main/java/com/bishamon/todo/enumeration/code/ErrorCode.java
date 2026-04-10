@@ -16,11 +16,15 @@ public enum ErrorCode {
     INVALID_REQUEST(HttpStatus.BAD_REQUEST, "Invalid request"),
     VALIDATION_ERROR(HttpStatus.BAD_REQUEST, "Validation failed"),
 
-//    // ============ AUTH ============
+    // ============ AUTHENTICATION ============
     UNAUTHENTICATED(HttpStatus.UNAUTHORIZED, "Authentication required"),
-    UNAUTHORIZED(HttpStatus.FORBIDDEN, "Access denied"),
+    ACCOUNT_DISABLED(HttpStatus.FORBIDDEN, "Account is disabled"),
+    ACCOUNT_LOCKED(HttpStatus.FORBIDDEN, "Account is locked"),
     TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "Token has expired"),
     TOKEN_INVALID(HttpStatus.UNAUTHORIZED, "Invalid token"),
+
+    // ============ AUTHORIZATION ============
+    UNAUTHORIZED(HttpStatus.FORBIDDEN, "Invalid email or password"),
 
     // ============ USER ============
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "User not found"),
