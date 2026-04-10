@@ -1,5 +1,6 @@
 package com.bishamon.todo.security;
 
+import com.bishamon.todo.enumeration.TokenType;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,20 +27,34 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     JwtTokenProvider jwtTokenProvider;
     CustomUserDetailsService userDetailsService;
 
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getServletPath();
+        return path.startsWith("/api/auth/")
+                || path.startsWith("/v3/api-docs")
+                || path.startsWith("/swagger-ui");
+    }
+
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain)
             throws ServletException, IOException {
         try {
-            String jwt = getJwtFromRequest(request);
-            if (StringUtils.hasText(jwt) && jwtTokenProvider.validateToken(jwt)) {
-                String tokenType = jwtTokenProvider.getTokenType(jwt);
-                if (!"ACCESS".equals(tokenType)) {
-                    filterChain.doFilter(request, response);
-                    return;
-                }
-                String email = jwtTokenProvider.getEmailFromToken(jwt);
+            String token = resolveToken(request);
+            if(!StringUtils.hasText(token)){
+                filterChain.doFilter(request, response);
+                return;
+            }
+            if(!jwtTokenProvider.validateToken(token)){
+                filterChain.doFilter(request, response);
+                return;
+            }
+            if (jwtTokenProvider.getTokenType(token) != TokenType.ACCESS) {
+                filterChain.doFilter(request, response);
+                return;
+            }
+            if(SecurityContextHolder.getContext().getAuthentication() == null){
+                String email = jwtTokenProvider.getEmailFromToken(token);
                 UserDetails userDetails = userDetailsService.loadUserByUsername(email);
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(
@@ -58,7 +73,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    public String getJwtFromRequest(HttpServletRequest request) {
+    public String resolveToken(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);

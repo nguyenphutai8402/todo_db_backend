@@ -1,17 +1,15 @@
 package com.bishamon.todo.security;
 
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.UnsupportedJwtException;
+import com.bishamon.todo.enumeration.TokenType;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -21,6 +19,9 @@ import java.util.Date;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Slf4j
 public class JwtTokenProvider {
+    static final String CLAIM_TYPE = "type";
+    static final String CLAIM_ROLE = "role";
+
     @Value("${jwt.secret-key}")
     String secretKeyString;
     @Value("${access-token-expiration}")
@@ -28,40 +29,55 @@ public class JwtTokenProvider {
     @Value("${refresh-token-expiration}")
     long refreshTokenExpiration;
 
-    private SecretKey getSigningKey(){
-        byte[] keyBytes = Decoders.BASE64.decode(secretKeyString);
-        return Keys.hmacShaKeyFor(keyBytes);
+    SecretKey signingKey;
+    JwtParser jwtParser;
+
+    @PostConstruct
+    void init() {
+        byte[] keyBytes = Decoders.BASE64URL.decode(secretKeyString);
+        signingKey = Keys.hmacShaKeyFor(keyBytes);
+
+        jwtParser = Jwts.parser()
+                .verifyWith(signingKey)
+                .build();
     }
 
-    public String buildToken(CustomUserDetails customUserDetails, long expiration, String tokenType){
+    private Claims parseClaims(String token) {
+        return jwtParser.parseSignedClaims(token).getPayload();
+    }
+
+    public String buildToken(CustomUserDetails customUserDetails, long expiration, TokenType tokenType) {
         Date now = new Date();
         Date expirationDate = new Date(now.getTime() + expiration);
         return Jwts.builder()
                 .subject(customUserDetails.getUsername())
-                .claim("type", tokenType)
-                .claim("role", customUserDetails.getGlobalRole())
+                .claim(CLAIM_TYPE, tokenType)
+                .claim(CLAIM_ROLE, customUserDetails.getGlobalRole())
                 .issuedAt(now)
                 .expiration(expirationDate)
-                .signWith(getSigningKey())
+                .signWith(signingKey)
                 .compact();
     }
 
-    public String generateAccessToken(Authentication authentication){
-        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
-        return buildToken(customUserDetails, accessTokenExpiration, "ACCESS");
+    public String generateAccessToken(CustomUserDetails userDetails) {
+        return buildToken(userDetails, accessTokenExpiration, TokenType.ACCESS);
     }
 
-    public String generateRefreshToken(Authentication authentication){
-        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
-        return buildToken(customUserDetails, accessTokenExpiration, "REFRESH");
+    public String generateRefreshToken(CustomUserDetails userDetails) {
+        return buildToken(userDetails, refreshTokenExpiration, TokenType.REFRESH);
     }
 
-    public boolean validateToken(String token){
+    public String generateAccessToken(Authentication authentication) {
+        return generateAccessToken((CustomUserDetails) authentication.getPrincipal());
+    }
+
+    public String generateRefreshToken(Authentication authentication) {
+        return generateRefreshToken((CustomUserDetails) authentication.getPrincipal());
+    }
+
+    public boolean validateToken(String token) {
         try {
-            Jwts.parser()
-                    .verifyWith(getSigningKey())
-                    .build()
-                    .parseSignedClaims(token);
+            parseClaims(token);
             return true;
         } catch (MalformedJwtException e) {
             log.error("Invalid JWT token: {}", e.getMessage());
@@ -75,21 +91,12 @@ public class JwtTokenProvider {
         return false;
     }
 
-    public String getEmailFromToken(String token){
-        return Jwts.parser()
-                .verifyWith(getSigningKey())
-                .build()
-                .parseSignedClaims(token)
-                .getPayload()
-                .getSubject();
+    public String getEmailFromToken(String token) {
+        return parseClaims(token).getSubject();
     }
 
-    public String getTokenType(String token){
-        return Jwts.parser()
-                .verifyWith(getSigningKey())
-                .build()
-                .parseSignedClaims(token)
-                .getPayload()
-                .get("type", String.class);
+    public TokenType getTokenType(String token) {
+        String type = parseClaims(token).get(CLAIM_TYPE).toString();
+        return TokenType.valueOf(type);
     }
 }

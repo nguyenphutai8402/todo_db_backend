@@ -17,22 +17,27 @@ import java.util.Collections;
 @Builder
 public class CustomUserDetails implements UserDetails {
     Long id;
-    String username;
+    String email;
     String password;
     String fullName;
     GlobalRole globalRole;
     Collection<? extends GrantedAuthority> authorities;
 
-    public static CustomUserDetails build(User user){
-        GrantedAuthority authority = new SimpleGrantedAuthority(user.getGlobalRole().name());
+    public static CustomUserDetails from(User user){
+        GrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + user.getGlobalRole().name());
         return CustomUserDetails.builder()
                 .id(user.getId())
-                .username(user.getEmail())
+                .email(user.getEmail())
                 .password(user.getPasswordHash())
                 .fullName(user.getFullName())
                 .globalRole(user.getGlobalRole())
                 .authorities(Collections.singletonList(authority))
                 .build();
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
     }
 
     @Override

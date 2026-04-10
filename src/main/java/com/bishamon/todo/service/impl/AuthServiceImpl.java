@@ -14,10 +14,10 @@ import com.bishamon.todo.service.AuthService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -33,33 +33,19 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthResponse register(RegisterRequest registerRequest) {
-        if(userRepository.existsByEmail(registerRequest.getEmail())){
-            throw new AppException(ErrorCode.USER_ALREADY_EXISTS);
-        }
-
         User user = authMapper.toUser(registerRequest);
         user.setPasswordHash(passwordEncoder.encode(registerRequest.getPassword()));
-
-        userRepository.save(user);
-
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        registerRequest.getEmail(),
-                        registerRequest.getPassword()
-                )
-        );
-
-//        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        String accessToken = jwtTokenProvider.generateAccessToken(authentication);
-        String refreshToken = jwtTokenProvider.generateRefreshToken(authentication);
-
-        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
-
+        try {
+            user = userRepository.save(user);
+        }catch (DataIntegrityViolationException e){
+            throw new AppException(ErrorCode.USER_ALREADY_EXISTS);
+        }
+        CustomUserDetails customUserDetails = CustomUserDetails.from(user);
+        String accessToken = jwtTokenProvider.generateAccessToken(customUserDetails);
+        String refreshToken = jwtTokenProvider.generateRefreshToken(customUserDetails);
         AuthResponse authResponse = authMapper.toAuthResponse(customUserDetails);
         authResponse.setAccessToken(accessToken);
         authResponse.setRefreshToken(refreshToken);
-
         return authResponse;
     }
 
@@ -71,17 +57,10 @@ public class AuthServiceImpl implements AuthService {
                         loginRequest.getPassword()
                 )
         );
-
-        String accessToken = jwtTokenProvider.generateAccessToken(authentication);
-        String refreshToken = jwtTokenProvider.generateRefreshToken(authentication);
-
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
-
         AuthResponse authResponse = authMapper.toAuthResponse(customUserDetails);
-        authResponse.setAccessToken(accessToken);
-        authResponse.setRefreshToken(refreshToken);
+        authResponse.setAccessToken(jwtTokenProvider.generateAccessToken(authentication));
+        authResponse.setRefreshToken(jwtTokenProvider.generateRefreshToken(authentication));
         return authResponse;
     }
-
-
 }

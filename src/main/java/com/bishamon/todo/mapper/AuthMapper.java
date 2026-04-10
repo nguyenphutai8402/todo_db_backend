@@ -14,6 +14,5 @@ public interface AuthMapper {
 
     @Mapping(target = "accessToken", ignore = true)
     @Mapping(target = "refreshToken", ignore = true)
-    @Mapping(target = "email", source = "username")
     AuthResponse toAuthResponse(CustomUserDetails customUserDetails);
 }

@@ -26,7 +26,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
-        ApiResponse<?> apiResponse = ApiResponse.error(ErrorCode.UNAUTHENTICATED, authException.getMessage());
+        ApiResponse<?> apiResponse = ApiResponse.error(ErrorCode.UNAUTHENTICATED, "Unauthorized");
 
         objectMapper.writeValue(response.getOutputStream(), apiResponse);
     }
