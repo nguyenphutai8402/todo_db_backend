@@ -33,6 +33,9 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthResponse register(RegisterRequest registerRequest) {
+        if(!registerRequest.getPassword().equals(registerRequest.getConfirmPassword())){
+            throw new AppException(ErrorCode.PASSWORD_MISMATCH);
+        }
         User user = authMapper.toUser(registerRequest);
         user.setPasswordHash(passwordEncoder.encode(registerRequest.getPassword()));
         try {

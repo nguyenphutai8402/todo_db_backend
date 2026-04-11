@@ -27,11 +27,14 @@ public enum ErrorCode {
     UNAUTHORIZED(HttpStatus.FORBIDDEN, "Invalid email or password"),
 
     // ============ USER ============
+    PASSWORD_MISMATCH(HttpStatus.BAD_REQUEST, "Password and confirm password do not match"),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "User not found"),
     USER_ALREADY_EXISTS(HttpStatus.CONFLICT, "User already exists"),
     USER_PASSWORD_WRONG(HttpStatus.BAD_REQUEST, "Incorrect password"),
+
     // ============ WORKSPACE ============
     WORKSPACE_NAME_DUPLICATE(HttpStatus.CONFLICT, "This workspace already exists with this user."),
+
     // ============ RESOURCE ============
     RESOURCE_NOT_FOUND(HttpStatus.NOT_FOUND, "Resource not found"),
     RESOURCE_ALREADY_EXISTS(HttpStatus.CONFLICT, "Resource already exists"),

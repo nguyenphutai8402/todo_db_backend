@@ -13,6 +13,10 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RegisterRequest {
+     @NotBlank(message = "Full Name is required")
+     @Size(max = 100, message = "Full name must not exceed 100 characters")
+     String fullName;
+
      @Email(message = "Invalid email")
      @NotBlank(message = "Email is required")
      @Size(max = 100, message = "Email must not exceed 100 characters")
@@ -21,7 +25,8 @@ public class RegisterRequest {
      @NotBlank(message = "Password is required")
      String password;
 
-     @NotBlank(message = "Full Name is required")
-     @Size(max = 100, message = "Full name must not exceed 100 characters")
-     String fullName;
+     @NotBlank(message = "Password is required")
+     String confirmPassword;
+
+
 }
