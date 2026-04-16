@@ -1,6 +1,7 @@
-package com.bishamon.todo.security;
+package com.bishamon.todo.security.jwt;
 
 import com.bishamon.todo.enumeration.TokenType;
+import com.bishamon.todo.security.user.CustomUserDetails;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
+import java.util.UUID;
 
 @Component
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -50,6 +52,7 @@ public class JwtTokenProvider {
         Date now = new Date();
         Date expirationDate = new Date(now.getTime() + expiration);
         return Jwts.builder()
+                .id(UUID.randomUUID().toString())
                 .subject(customUserDetails.getUsername())
                 .claim(CLAIM_TYPE, tokenType)
                 .claim(CLAIM_ROLE, customUserDetails.getGlobalRole())
@@ -98,5 +101,9 @@ public class JwtTokenProvider {
     public TokenType getTokenType(String token) {
         String type = parseClaims(token).get(CLAIM_TYPE).toString();
         return TokenType.valueOf(type);
+    }
+
+    public String getJtiFromToken(String token) {
+        return parseClaims(token).getId();
     }
 }

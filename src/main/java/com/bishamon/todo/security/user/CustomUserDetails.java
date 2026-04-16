@@ -1,4 +1,4 @@
-package com.bishamon.todo.security;
+package com.bishamon.todo.security.user;
 
 import com.bishamon.todo.entity.User;
 import com.bishamon.todo.enumeration.GlobalRole;

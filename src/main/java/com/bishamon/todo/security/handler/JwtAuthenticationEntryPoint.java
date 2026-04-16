@@ -1,4 +1,4 @@
-package com.bishamon.todo.security;
+package com.bishamon.todo.security.handler;
 
 import com.bishamon.todo.dto.response.common.ApiResponse;
 import com.bishamon.todo.enumeration.code.ErrorCode;

@@ -22,6 +22,11 @@ public enum ErrorCode {
     ACCOUNT_LOCKED(HttpStatus.FORBIDDEN, "Account is locked"),
     TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "Token has expired"),
     TOKEN_INVALID(HttpStatus.UNAUTHORIZED, "Invalid token"),
+    EXPIRED_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "Refresh token has expired"),
+    INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "Invalid refresh token"),
+    INVALID_REFRESH_TOKEN_TYPE(HttpStatus.UNAUTHORIZED, "Token is not a refresh token."),
+    REFRESH_TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, "Refresh token not found"),
+    REFRESH_TOKEN_REVOKED(HttpStatus.UNAUTHORIZED, "The Refresh token has been revoked."),
 
     // ============ AUTHORIZATION ============
     UNAUTHORIZED(HttpStatus.FORBIDDEN, "Invalid email or password"),
@@ -38,6 +43,9 @@ public enum ErrorCode {
     // ============ RESOURCE ============
     RESOURCE_NOT_FOUND(HttpStatus.NOT_FOUND, "Resource not found"),
     RESOURCE_ALREADY_EXISTS(HttpStatus.CONFLICT, "Resource already exists"),
+
+    // ============ HASH ============
+    TOKEN_HASH_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "Cannot hash token"),
     ;
 
     HttpStatusCode httpStatus;

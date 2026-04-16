@@ -12,7 +12,6 @@ import lombok.experimental.FieldDefaults;
 @Builder
 public class AuthResponse {
     String accessToken;
-    String refreshToken;
     @Builder.Default
     String tokenType = "Bearer";
     Long id;

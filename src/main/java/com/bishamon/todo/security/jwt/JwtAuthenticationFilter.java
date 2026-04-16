@@ -1,6 +1,7 @@
-package com.bishamon.todo.security;
+package com.bishamon.todo.security.jwt;
 
 import com.bishamon.todo.enumeration.TokenType;
+import com.bishamon.todo.security.user.CustomUserDetailsService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
