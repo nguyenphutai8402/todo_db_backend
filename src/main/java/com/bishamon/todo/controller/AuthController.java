@@ -52,4 +52,14 @@ public class AuthController {
                 ApiResponse.success(SuccessCode.OK, authResponse)
         );
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponse<Void>> logout(
+            HttpServletRequest request, HttpServletResponse response
+    ){
+        authService.logout(request, response);
+        return ResponseEntity.ok(
+                ApiResponse.success(SuccessCode.OK)
+        );
+    }
 }

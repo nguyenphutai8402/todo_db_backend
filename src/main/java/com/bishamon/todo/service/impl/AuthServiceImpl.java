@@ -15,6 +15,7 @@ import com.bishamon.todo.security.user.CustomUserDetails;
 import com.bishamon.todo.security.jwt.JwtTokenProvider;
 import com.bishamon.todo.service.AuthService;
 import com.bishamon.todo.util.CookieService;
+import com.bishamon.todo.util.TokenBlacklistService;
 import com.bishamon.todo.util.TokenHashService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -32,6 +33,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.time.Instant;
 
@@ -47,6 +49,7 @@ public class AuthServiceImpl implements AuthService {
     AuthMapper authMapper;
     CookieService cookieService;
     TokenHashService tokenHashService;
+    TokenBlacklistService tokenBlacklistService;
     RefreshTokenRepository refreshTokenRepository;
 
     @Value("${refresh-token-expiration}")
@@ -142,6 +145,41 @@ public class AuthServiceImpl implements AuthService {
         return authResponse;
     }
 
+    @Override
+    public void logout(HttpServletRequest request, HttpServletResponse response) {
+        cookieService.getRefreshToken(request).ifPresent(refreshToken -> {
+            try {
+                if(jwtTokenProvider.validateToken(refreshToken)
+                && jwtTokenProvider.getTokenType(refreshToken) == TokenType.REFRESH){
+                    String jti = jwtTokenProvider.getJtiFromToken(refreshToken);
+                    refreshTokenRepository.findByJti(jti).ifPresent(storedToken -> {
+                        if(tokenHashService.matches(refreshToken, storedToken.getTokenHash())){
+                            storedToken.setRevoked(true);
+                            refreshTokenRepository.save(storedToken);
+                        }
+                    });
+                }
+            }catch (Exception e){
+
+            }
+        });
+        String accessToken = resolveBearerToken(request);
+        if (StringUtils.hasText(accessToken)
+                && jwtTokenProvider.validateToken(accessToken)
+                && jwtTokenProvider.getTokenType(accessToken) == TokenType.ACCESS) {
+
+            tokenBlacklistService.blacklist(
+                    jwtTokenProvider.getJtiFromToken(accessToken),
+                    jwtTokenProvider.getExpirationFromToken(accessToken));
+
+        }
+
+        response.addHeader(
+                HttpHeaders.SET_COOKIE,
+                cookieService.deleteRefreshCookie().toString()
+        );
+    }
+
     public AuthResponse issueToken(User user, HttpServletResponse response) {
         CustomUserDetails customUserDetails = CustomUserDetails.from(user);
 
@@ -164,5 +202,13 @@ public class AuthServiceImpl implements AuthService {
         AuthResponse authResponse = authMapper.toAuthResponse(customUserDetails);
         authResponse.setAccessToken(accessToken);
         return authResponse;
+    }
+
+    private String resolveBearerToken(HttpServletRequest request) {
+        String bearerToken = request.getHeader("Authorization");
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7);
+        }
+        return null;
     }
 }
