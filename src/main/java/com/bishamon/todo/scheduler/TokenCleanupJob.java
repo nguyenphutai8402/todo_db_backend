@@ -1,4 +1,4 @@
-package com.bishamon.todo.config;
+package com.bishamon.todo.scheduler;
 
 import com.bishamon.todo.repository.BlacklistedAccessTokenRepository;
 import com.bishamon.todo.repository.RefreshTokenRepository;

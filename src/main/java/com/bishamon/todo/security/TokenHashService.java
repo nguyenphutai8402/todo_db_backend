@@ -1,4 +1,4 @@
-package com.bishamon.todo.util;
+package com.bishamon.todo.security;
 
 import com.bishamon.todo.enumeration.code.ErrorCode;
 import com.bishamon.todo.exception.AppException;

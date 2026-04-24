@@ -1,4 +1,4 @@
-package com.bishamon.todo.util;
+package com.bishamon.todo.security;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;

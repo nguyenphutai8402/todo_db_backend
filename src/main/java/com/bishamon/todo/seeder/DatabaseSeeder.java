@@ -1,4 +1,4 @@
-package com.bishamon.todo.config;
+package com.bishamon.todo.seeder;
 
 import com.bishamon.todo.entity.User;
 import com.bishamon.todo.enumeration.GlobalRole;
@@ -9,8 +9,6 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-
-import java.time.LocalDateTime;
 
 @Component
 @AllArgsConstructor

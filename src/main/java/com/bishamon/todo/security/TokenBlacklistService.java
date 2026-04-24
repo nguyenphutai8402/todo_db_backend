@@ -1,4 +1,4 @@
-package com.bishamon.todo.util;
+package com.bishamon.todo.security;
 
 import com.bishamon.todo.entity.BlacklistedAccessToken;
 import com.bishamon.todo.repository.BlacklistedAccessTokenRepository;
