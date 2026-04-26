@@ -9,14 +9,17 @@ import com.bishamon.todo.enumeration.TokenType;
 import com.bishamon.todo.enumeration.code.ErrorCode;
 import com.bishamon.todo.exception.AppException;
 import com.bishamon.todo.mapper.AuthMapper;
+import com.bishamon.todo.repository.BlacklistedAccessTokenRepository;
 import com.bishamon.todo.repository.RefreshTokenRepository;
 import com.bishamon.todo.repository.UserRepository;
 import com.bishamon.todo.security.user.CustomUserDetails;
 import com.bishamon.todo.security.jwt.JwtTokenProvider;
 import com.bishamon.todo.service.AuthService;
 import com.bishamon.todo.security.CookieService;
-import com.bishamon.todo.security.TokenBlacklistService;
 import com.bishamon.todo.security.TokenHashService;
+import com.bishamon.todo.service.BlackListedAccessTokenService;
+import com.bishamon.todo.service.RefreshTokenService;
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AccessLevel;
@@ -45,17 +48,11 @@ public class AuthServiceImpl implements AuthService {
     AuthenticationManager authenticationManager;
     JwtTokenProvider jwtTokenProvider;
     UserRepository userRepository;
+    RefreshTokenService refreshTokenService;
+    BlackListedAccessTokenService blackListedAccessTokenService;
+    CookieService cookieService;
     PasswordEncoder passwordEncoder;
     AuthMapper authMapper;
-    CookieService cookieService;
-    TokenHashService tokenHashService;
-    TokenBlacklistService tokenBlacklistService;
-    RefreshTokenRepository refreshTokenRepository;
-
-    @Value("${refresh-token-expiration}")
-    @NonFinal
-    long refreshTokenExpiration;
-
 
     @Override
     public AuthResponse register(RegisterRequest registerRequest, HttpServletResponse response) {
@@ -69,7 +66,7 @@ public class AuthServiceImpl implements AuthService {
         } catch (DataIntegrityViolationException e) {
             throw new AppException(ErrorCode.USER_ALREADY_EXISTS);
         }
-        return issueToken(user, response);
+        return issueTokenAndBuildResponse(user, response);
     }
 
     @Override
@@ -83,7 +80,7 @@ public class AuthServiceImpl implements AuthService {
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
         User user = userRepository.findById(customUserDetails.getId())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-        return issueToken(user, response);
+        return issueTokenAndBuildResponse(user, response);
     }
 
     @Override
@@ -94,54 +91,25 @@ public class AuthServiceImpl implements AuthService {
             throw new AppException(ErrorCode.INVALID_REFRESH_TOKEN);
         }
 
-        if (jwtTokenProvider.getTokenType(refreshToken) != TokenType.REFRESH) {
+        Claims refreshClaims = jwtTokenProvider.parseClaims(refreshToken);
+        if (jwtTokenProvider.getTokenType(refreshClaims) != TokenType.REFRESH) {
             throw new AppException(ErrorCode.INVALID_REFRESH_TOKEN_TYPE);
         }
 
-        String jti = jwtTokenProvider.getJtiFromToken(refreshToken);
-        RefreshToken storedToken = refreshTokenRepository.findByJti(jti).orElseThrow(
-                () -> new AppException(ErrorCode.REFRESH_TOKEN_NOT_FOUND)
-        );
-
-        if (storedToken.isRevoked()) {
-            throw new AppException(ErrorCode.REFRESH_TOKEN_REVOKED);
-        }
-
-        if (storedToken.getExpiryDate().isBefore(Instant.now())) {
-            throw new AppException(ErrorCode.EXPIRED_REFRESH_TOKEN);
-        }
-
-        if (!tokenHashService.matches(refreshToken, storedToken.getTokenHash())) {
-            throw new AppException(ErrorCode.INVALID_REFRESH_TOKEN);
-        }
-
-        storedToken.setRevoked(true);
-        refreshTokenRepository.save(storedToken);
+        RefreshToken storedToken = refreshTokenService.validateAndGet(refreshToken, refreshClaims);
 
         User user = storedToken.getUser();
         CustomUserDetails customUserDetails = CustomUserDetails.from(user);
 
         String newAccessToken = jwtTokenProvider.generateAccessToken(customUserDetails);
         String newRefreshToken = jwtTokenProvider.generateRefreshToken(customUserDetails);
+        Claims newRefeshClaims = jwtTokenProvider.parseClaims(newRefreshToken);
+        refreshTokenService.rotate(storedToken, user, newRefreshToken, newRefeshClaims);
 
-        RefreshToken token = RefreshToken.builder()
-                .jti(jwtTokenProvider.getJtiFromToken(newRefreshToken))
-                .tokenHash(tokenHashService.hash(newRefreshToken))
-                .expiryDate(Instant.now().plusMillis(refreshTokenExpiration))
-                .revoked(false)
-                .user(user)
-                .build();
-
-        refreshTokenRepository.save(token);
-
-        response.addHeader(
-                HttpHeaders.SET_COOKIE,
-                cookieService.createRefreshToken(newRefreshToken, refreshTokenExpiration).toString()
-        );
+        setRefreshTokenCookie(response, newRefreshToken);
 
         AuthResponse authResponse = authMapper.toAuthResponse(customUserDetails);
         authResponse.setAccessToken(newAccessToken);
-
         return authResponse;
     }
 
@@ -149,59 +117,48 @@ public class AuthServiceImpl implements AuthService {
     public void logout(HttpServletRequest request, HttpServletResponse response) {
         cookieService.getRefreshToken(request).ifPresent(refreshToken -> {
             try {
-                if(jwtTokenProvider.validateToken(refreshToken)
-                && jwtTokenProvider.getTokenType(refreshToken) == TokenType.REFRESH){
-                    String jti = jwtTokenProvider.getJtiFromToken(refreshToken);
-                    refreshTokenRepository.findByJti(jti).ifPresent(storedToken -> {
-                        if(tokenHashService.matches(refreshToken, storedToken.getTokenHash())){
-                            storedToken.setRevoked(true);
-                            refreshTokenRepository.save(storedToken);
-                        }
-                    });
-                }
+                if(!jwtTokenProvider.validateToken(refreshToken))return;
+                Claims refreshClaims = jwtTokenProvider.parseClaims(refreshToken);
+                if(jwtTokenProvider.getTokenType(refreshClaims) != TokenType.REFRESH) return;
+                refreshTokenService.revokeIfPresent(refreshToken, refreshClaims);
             }catch (Exception e){
-
+                log.warn("Failed to revoke refresh token during logout: {}", e.getMessage());
             }
         });
         String accessToken = resolveBearerToken(request);
-        if (StringUtils.hasText(accessToken)
-                && jwtTokenProvider.validateToken(accessToken)
-                && jwtTokenProvider.getTokenType(accessToken) == TokenType.ACCESS) {
-
-            tokenBlacklistService.blacklist(
-                    jwtTokenProvider.getJtiFromToken(accessToken),
-                    jwtTokenProvider.getExpirationFromToken(accessToken));
-
-        }
-
+        if (accessToken == null) return;
+        if (!jwtTokenProvider.validateToken(accessToken)) return;
+        Claims accessClaims = jwtTokenProvider.parseClaims(accessToken);
+        if (jwtTokenProvider.getTokenType(accessClaims) != TokenType.ACCESS) return;
+        blackListedAccessTokenService.blacklist(
+                jwtTokenProvider.getJti(accessClaims),
+                jwtTokenProvider.getExpiration(accessClaims));
         response.addHeader(
                 HttpHeaders.SET_COOKIE,
                 cookieService.deleteRefreshCookie().toString()
         );
     }
 
-    public AuthResponse issueToken(User user, HttpServletResponse response) {
+    public AuthResponse issueTokenAndBuildResponse(User user, HttpServletResponse response) {
         CustomUserDetails customUserDetails = CustomUserDetails.from(user);
 
         String accessToken = jwtTokenProvider.generateAccessToken(customUserDetails);
         String refreshToken = jwtTokenProvider.generateRefreshToken(customUserDetails);
 
-        RefreshToken storedToken = RefreshToken.builder()
-                .jti(jwtTokenProvider.getJtiFromToken(refreshToken))
-                .tokenHash(tokenHashService.hash(refreshToken))
-                .revoked(false)
-                .expiryDate(Instant.now().plusMillis(refreshTokenExpiration))
-                .user(user)
-                .build();
-        refreshTokenRepository.save(storedToken);
+        Claims refreshClaims = jwtTokenProvider.parseClaims(refreshToken);
+        refreshTokenService.store(user, refreshToken, refreshClaims);
 
-        ResponseCookie cookie = cookieService.createRefreshToken(refreshToken, refreshTokenExpiration);
-
-        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+        setRefreshTokenCookie(response, refreshToken);
 
         AuthResponse authResponse = authMapper.toAuthResponse(customUserDetails);
         authResponse.setAccessToken(accessToken);
         return authResponse;
+    }
+
+    private void setRefreshTokenCookie(HttpServletResponse response, String refreshToken) {
+        long expiration = jwtTokenProvider.getRefreshTokenExpiration();
+        ResponseCookie cookie = cookieService.createRefreshToken(refreshToken, expiration);
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
 
     private String resolveBearerToken(HttpServletRequest request) {

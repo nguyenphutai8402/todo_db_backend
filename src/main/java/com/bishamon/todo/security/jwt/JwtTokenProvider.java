@@ -7,6 +7,7 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,6 +20,7 @@ import java.util.Date;
 import java.util.UUID;
 
 @Component
+@Getter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Slf4j
 public class JwtTokenProvider {
@@ -45,7 +47,7 @@ public class JwtTokenProvider {
                 .build();
     }
 
-    private Claims parseClaims(String token) {
+    public Claims parseClaims(String token) {
         return jwtParser.parseSignedClaims(token).getPayload();
     }
 
@@ -95,20 +97,19 @@ public class JwtTokenProvider {
         return false;
     }
 
-    public String getEmailFromToken(String token) {
-        return parseClaims(token).getSubject();
+    public String getJti(Claims claims) {
+        return claims.getId();
     }
 
-    public TokenType getTokenType(String token) {
-        String type = parseClaims(token).get(CLAIM_TYPE).toString();
-        return TokenType.valueOf(type);
+    public String getSubject(Claims claims) {
+        return claims.getSubject();
     }
 
-    public String getJtiFromToken(String token) {
-        return parseClaims(token).getId();
+    public TokenType getTokenType(Claims claims) {
+        return TokenType.valueOf(claims.get(CLAIM_TYPE, String.class));
     }
 
-    public Instant getExpirationFromToken(String token){
-        return parseClaims(token).getExpiration().toInstant();
+    public Instant getExpiration(Claims claims) {
+        return claims.getExpiration().toInstant();
     }
 }

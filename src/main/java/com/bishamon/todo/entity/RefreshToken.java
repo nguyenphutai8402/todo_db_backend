@@ -22,7 +22,7 @@ public class RefreshToken {
     @Column(nullable = false, unique = true, length = 36)
     private String jti;
 
-    @Column(name = "token_hash", nullable = false, unique = true, length = 50)
+    @Column(name = "token_hash", unique = true, nullable = false, length = 128)
     String tokenHash;
 
     @Column(nullable = false)
@@ -34,4 +34,8 @@ public class RefreshToken {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     User user;
+
+    public void revoke(){
+        this.revoked = true;
+    }
 }

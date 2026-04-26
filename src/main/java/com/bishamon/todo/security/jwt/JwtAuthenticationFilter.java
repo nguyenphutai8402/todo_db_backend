@@ -2,7 +2,8 @@ package com.bishamon.todo.security.jwt;
 
 import com.bishamon.todo.enumeration.TokenType;
 import com.bishamon.todo.security.user.CustomUserDetailsService;
-import com.bishamon.todo.security.TokenBlacklistService;
+import com.bishamon.todo.service.impl.BlackListedAccessTokenServiceImpl;
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,7 +29,7 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     JwtTokenProvider jwtTokenProvider;
     CustomUserDetailsService userDetailsService;
-    TokenBlacklistService tokenBlacklistService;
+    BlackListedAccessTokenServiceImpl blackListedAccessTokenServiceImpl;
 
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getServletPath();
@@ -52,17 +53,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 filterChain.doFilter(request, response);
                 return;
             }
-            if (jwtTokenProvider.getTokenType(token) != TokenType.ACCESS) {
+            Claims claims = jwtTokenProvider.parseClaims(token);
+            if (jwtTokenProvider.getTokenType(claims) != TokenType.ACCESS) {
                 filterChain.doFilter(request, response);
                 return;
             }
-            String jti = jwtTokenProvider.getJtiFromToken(token);
-            if(tokenBlacklistService.isBlacklisted(jti)){
+            String jti = jwtTokenProvider.getJti(claims);
+            if(blackListedAccessTokenServiceImpl.isBlacklisted(jti)){
                 filterChain.doFilter(request, response);
                 return;
             }
             if(SecurityContextHolder.getContext().getAuthentication() == null){
-                String email = jwtTokenProvider.getEmailFromToken(token);
+                String email = jwtTokenProvider.getSubject(claims);
                 UserDetails userDetails = userDetailsService.loadUserByUsername(email);
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(
