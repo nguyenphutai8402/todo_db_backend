@@ -33,13 +33,24 @@ CREATE TABLE IF NOT EXISTS `activities` (
 
 -- Data exporting was unselected.
 
+-- Dumping structure for table tododb.blacklisted_access_token
+CREATE TABLE IF NOT EXISTS `blacklisted_access_token` (
+  `expiry_date` datetime(6) NOT NULL,
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `jti` varchar(36) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `UKrdq7rj0218jcuym0ivt0jcg04` (`jti`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Data exporting was unselected.
+
 -- Dumping structure for table tododb.board_members
 CREATE TABLE IF NOT EXISTS `board_members` (
   `board_id` bigint(20) NOT NULL,
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `joined_at` datetime(6) DEFAULT NULL,
   `user_id` bigint(20) NOT NULL,
-  `contextual_role` enum('MEMBER','OBSERVER','OWNER') NOT NULL,
+  `contextual_role` enum('MANAGER','MEMBER','OBSERVER','OWNER') NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `UKdip0gtav4cxokql76sf0981t4` (`board_id`,`user_id`),
   KEY `FK80hd8sx9wrhibcfwv37pvmxb6` (`user_id`),
@@ -202,7 +213,7 @@ CREATE TABLE IF NOT EXISTS `invites` (
   `workspace_id` bigint(20) DEFAULT NULL,
   `email` varchar(255) NOT NULL,
   `token` varchar(255) NOT NULL,
-  `contextual_role` enum('MEMBER','OBSERVER','OWNER') NOT NULL,
+  `contextual_role` enum('MANAGER','MEMBER','OBSERVER','OWNER') NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `UK1ws9kt1ybdrcww2o5w8300lty` (`token`),
   KEY `FK9hsiws556hnuqrk2mhn19o2xr` (`board_id`),
@@ -246,6 +257,23 @@ CREATE TABLE IF NOT EXISTS `lists` (
 
 -- Data exporting was unselected.
 
+-- Dumping structure for table tododb.refresh_tokens
+CREATE TABLE IF NOT EXISTS `refresh_tokens` (
+  `revoked` bit(1) NOT NULL,
+  `expiry_date` datetime(6) NOT NULL,
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `user_id` bigint(20) NOT NULL,
+  `jti` varchar(36) NOT NULL,
+  `token_hash` varchar(128) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `UK18kw8ppjw4gmmgdns9ecyg17b` (`jti`),
+  UNIQUE KEY `UKo2mlirhldriil2y7krapq4frt` (`token_hash`),
+  KEY `FK1lih5y2npsf8u5o3vhdb9y0os` (`user_id`),
+  CONSTRAINT `FK1lih5y2npsf8u5o3vhdb9y0os` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Data exporting was unselected.
+
 -- Dumping structure for table tododb.users
 CREATE TABLE IF NOT EXISTS `users` (
   `created_at` datetime(6) DEFAULT NULL,
@@ -269,13 +297,13 @@ CREATE TABLE IF NOT EXISTS `workspace_members` (
   `joined_at` datetime(6) NOT NULL,
   `user_id` bigint(20) NOT NULL,
   `workspace_id` bigint(20) NOT NULL,
-  `contextual_role` enum('MEMBER','OBSERVER','OWNER') NOT NULL,
+  `contextual_role` enum('MANAGER','MEMBER','OBSERVER','OWNER') NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `UK6se2rw5firt04m4vpmqvbnr4u` (`workspace_id`,`user_id`),
   KEY `FK6vtnpc3eexk504u61uepn40p1` (`user_id`),
   CONSTRAINT `FK6vtnpc3eexk504u61uepn40p1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
   CONSTRAINT `FKw9hq87n3rvq2c4j47qo78i5r` FOREIGN KEY (`workspace_id`) REFERENCES `workspaces` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Data exporting was unselected.
 
@@ -285,15 +313,15 @@ CREATE TABLE IF NOT EXISTS `workspaces` (
   `created_by` bigint(20) NOT NULL,
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `updated_at` datetime(6) DEFAULT NULL,
-  `name` varchar(150) NOT NULL,
   `description` text DEFAULT NULL,
   `logo_url` text DEFAULT NULL,
+  `name` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `visibility` enum('PRIVATE','PUBLIC') NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `UKadrg6adoh0289s3gtbkv3fxmq` (`name`,`created_by`),
   KEY `FKlwdvhq4w0563rrp55oy8m0pcb` (`created_by`),
   CONSTRAINT `FKlwdvhq4w0563rrp55oy8m0pcb` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Data exporting was unselected.
 
