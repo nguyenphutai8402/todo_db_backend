@@ -20,6 +20,7 @@ public enum ErrorCode {
     UNAUTHENTICATED(HttpStatus.UNAUTHORIZED, "Authentication required"),
     ACCOUNT_DISABLED(HttpStatus.FORBIDDEN, "Account is disabled"),
     ACCOUNT_LOCKED(HttpStatus.FORBIDDEN, "Account is locked"),
+    FORBIDDEN(HttpStatus.FORBIDDEN, "You don't have permission to perform this action"),
     TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "Token has expired"),
     TOKEN_INVALID(HttpStatus.UNAUTHORIZED, "Invalid token"),
     EXPIRED_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "Refresh token has expired"),
@@ -36,8 +37,10 @@ public enum ErrorCode {
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "User not found"),
     USER_ALREADY_EXISTS(HttpStatus.CONFLICT, "User already exists"),
     USER_PASSWORD_WRONG(HttpStatus.BAD_REQUEST, "Incorrect password"),
+    USER_NOT_A_MEMBER(HttpStatus.FORBIDDEN, "The current user is not a member"),
 
     // ============ WORKSPACE ============
+    WORKSPACE_NOT_FOUND(HttpStatus.NOT_FOUND, "Workspace not found"),
     WORKSPACE_NAME_DUPLICATE(HttpStatus.CONFLICT, "This workspace already exists with this user."),
 
     // ============ RESOURCE ============
@@ -50,7 +53,6 @@ public enum ErrorCode {
 
     HttpStatusCode httpStatus;
     String message;
-
 
     public String getCode() {
         return this.name();

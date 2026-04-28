@@ -23,8 +23,9 @@ public class Workspace extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    @Column(nullable = false, length = 150)
-    String name;
+    @Column(name = "name", nullable = false,
+            columnDefinition = "varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin")
+    private String name;
 
     @Column(columnDefinition = "TEXT")
     String description;

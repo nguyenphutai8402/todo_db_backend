@@ -11,7 +11,7 @@ import java.util.List;
 
 @Repository
 public interface WorkspaceRepository extends JpaRepository<Workspace, Long> {
-    boolean existsByCreatedByAndNameIgnoreCase(User createdBy, String name);
+    boolean existsByCreatedByAndName(User createdBy, String name);
 
     @Query("""
                 select w from Workspace w
@@ -19,4 +19,6 @@ public interface WorkspaceRepository extends JpaRepository<Workspace, Long> {
                 where wm.user.id = :userId
             """)
     List<Workspace> findAllByUserId(@Param("userId") Long userId);
+
+    boolean existsByCreatedByAndNameAndIdNot(User createdBy, String name, Long id);
 }

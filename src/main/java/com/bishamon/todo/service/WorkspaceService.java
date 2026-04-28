@@ -1,12 +1,14 @@
 package com.bishamon.todo.service;
 
-import com.bishamon.todo.dto.request.workspace.CreateWorkspaceRequest;
-import com.bishamon.todo.dto.response.workspace.CreateWorkspaceResponse;
+import com.bishamon.todo.dto.request.workspace.WorkspaceRequest;
+import com.bishamon.todo.dto.response.workspace.WorkspaceDetailResponse;
 import com.bishamon.todo.dto.response.workspace.WorkspaceSummaryResponse;
 
 import java.util.List;
 
 public interface WorkspaceService {
-    CreateWorkspaceResponse createWorkspace(CreateWorkspaceRequest createWorkSpaceRequest);
-    List<WorkspaceSummaryResponse> getMyWorkspaces();
+    WorkspaceDetailResponse createWorkspace(WorkspaceRequest workSpaceRequest, Long currentUserId);
+    List<WorkspaceSummaryResponse> getMyWorkspaces(Long currentUserId);
+    WorkspaceDetailResponse updateWorkspace(
+            Long workspaceId,  Long currentUserId, WorkspaceRequest workspaceRequest);
 }

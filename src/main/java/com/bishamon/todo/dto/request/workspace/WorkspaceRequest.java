@@ -10,7 +10,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CreateWorkspaceRequest {
+public class WorkspaceRequest {
     @NotBlank(message = "Workspace name is required")
     @Size(max = 150, message = "Workspace name must not exceed 150 characters")
     private String name;

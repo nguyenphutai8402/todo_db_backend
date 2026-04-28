@@ -10,12 +10,9 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-//@JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserSummaryResponse {
     private Long id;
     private String email;
     private String fullName;
     private String avatarUrl;
-    private UserStatus status;
-    private GlobalRole globalRole;
 }

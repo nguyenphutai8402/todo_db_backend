@@ -14,6 +14,8 @@ public interface BlacklistedAccessTokenRepository extends JpaRepository<Blacklis
     boolean existsByJti(String jti);
 
     @Modifying
-    @Query("DELETE FROM BlacklistedAccessToken b WHERE b.expiryDate < :now")
+    @Query("""
+            DELETE FROM BlacklistedAccessToken b WHERE b.expiryDate < :now
+            """)
     int deleteByExpiryDateBefore(@Param("now") Instant now);
 }

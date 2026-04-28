@@ -14,8 +14,6 @@ public interface WorkspaceMemberMapper {
     @Mapping(source = "user.email", target = "email")
     @Mapping(source = "user.fullName", target = "fullName")
     @Mapping(source = "user.avatarUrl", target = "avatarUrl")
-    @Mapping(source = "user.status", target = "status")
-    @Mapping(source = "user.globalRole", target = "globalRole")
     UserSummaryResponse toUserSummaryResponse(WorkspaceMember workspaceMember);
     List<UserSummaryResponse> toUserSummaryResponseList(Set<WorkspaceMember> members);
 }

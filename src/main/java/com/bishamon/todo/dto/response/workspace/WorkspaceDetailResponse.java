@@ -6,20 +6,21 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class WorkspaceDetailResponse {
     Long id;
     String name;
     String description;
     String logoUrl;
     Visibility visibility;
+    UserSummaryResponse createdBy;
+    int memberCount;
     LocalDateTime createdAt;
     LocalDateTime updateAt;
 }
