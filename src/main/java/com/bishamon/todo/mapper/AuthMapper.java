@@ -13,5 +13,5 @@ public interface AuthMapper {
     User toUser(RegisterRequest registerRequest);
 
     @Mapping(target = "accessToken", ignore = true)
-    AuthResponse toAuthResponse(CustomUserDetails customUserDetails);
+    AuthResponse toAuthResponse(User user);
 }

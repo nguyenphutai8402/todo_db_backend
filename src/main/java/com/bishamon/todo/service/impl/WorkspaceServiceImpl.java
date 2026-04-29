@@ -14,6 +14,7 @@ import com.bishamon.todo.mapper.WorkspaceMapper;
 import com.bishamon.todo.repository.UserRepository;
 import com.bishamon.todo.repository.WorkspaceMemberRepository;
 import com.bishamon.todo.repository.WorkspaceRepository;
+import com.bishamon.todo.service.ImageService;
 import com.bishamon.todo.service.WorkspaceService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -32,8 +33,8 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     UserRepository userRepository;
     WorkspaceRepository workspaceRepository;
     WorkspaceMemberRepository workspaceMemberRepository;
-
     WorkspaceMapper workspaceMapper;
+    ImageService imageService;
 
     @Override
     @Transactional
@@ -47,6 +48,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         Workspace workspace = workspaceMapper.toWorkspace(workSpaceRequest);
         if (workspace.getVisibility() == null) workspace.setVisibility(Visibility.PRIVATE);
 
+        if (workspace.getLogoUrl() == null) workspace.setLogoUrl(imageService.generateImageUrl(workspace.getName()));
         workspace.setCreatedBy(currentUser);
 
         WorkspaceMember ownerMember = WorkspaceMember.builder()

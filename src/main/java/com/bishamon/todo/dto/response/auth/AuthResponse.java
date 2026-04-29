@@ -17,5 +17,6 @@ public class AuthResponse {
     Long id;
     String email;
     String fullName;
+    String avatarUrl;
     GlobalRole globalRole;
 }

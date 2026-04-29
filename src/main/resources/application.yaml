@@ -1,0 +1,41 @@
+spring:
+  application:
+    name: todo
+  datasource:
+    url: jdbc:mysql://localhost:3306/tododb
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+
+server:
+  port: 8080
+  servlet:
+    context-path: /todo
+
+jwt:
+  secret-key: ${JWT_SECRET_KEY}
+  refresh-token-hash-pepper: ${JWT_REFRESH_TOKEN_HASH_PEPPER}
+  access-token-expiration: ${ACCESS_TOKEN_EXPIRATION}
+  refresh-token-expiration: ${REFRESH_TOKEN_EXPIRATION}
+
+
+app:
+  cookie:
+    refresh-name: refreshToken
+    refresh-path: /todo/api/auth
+    same-site: Lax
+    secure: false
+  jobs:
+    token-cleanup-cron: "0 0 3 * * *"
+    time-zone: Asia/Ho_Chi_Minh
+
+cloudinary:
+  cloud-name: ${CLOUDINARY_CLOUD_NAME}
+  api-key: ${CLOUDINARY_API_KEY}
+  api-secret: ${CLOUDINARY_API_SECRET}
+  folder:
+    workspace-logo: workspaces/logos
+    user-avatar: users/avatars

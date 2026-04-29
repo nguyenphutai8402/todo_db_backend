@@ -18,6 +18,7 @@ import com.bishamon.todo.service.AuthService;
 import com.bishamon.todo.security.CookieService;
 import com.bishamon.todo.security.TokenHashService;
 import com.bishamon.todo.service.BlackListedAccessTokenService;
+import com.bishamon.todo.service.ImageService;
 import com.bishamon.todo.service.RefreshTokenService;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
@@ -51,6 +52,7 @@ public class AuthServiceImpl implements AuthService {
     RefreshTokenService refreshTokenService;
     BlackListedAccessTokenService blackListedAccessTokenService;
     CookieService cookieService;
+    ImageService imageService;
     PasswordEncoder passwordEncoder;
     AuthMapper authMapper;
 
@@ -61,6 +63,7 @@ public class AuthServiceImpl implements AuthService {
         }
         User user = authMapper.toUser(registerRequest);
         user.setPasswordHash(passwordEncoder.encode(registerRequest.getPassword()));
+        if(user.getAvatarUrl() == null) user.setAvatarUrl(imageService.generateImageUrl(user.getFullName()));
         try {
             user = userRepository.save(user);
         } catch (DataIntegrityViolationException e) {
@@ -108,7 +111,7 @@ public class AuthServiceImpl implements AuthService {
 
         setRefreshTokenCookie(response, newRefreshToken);
 
-        AuthResponse authResponse = authMapper.toAuthResponse(customUserDetails);
+        AuthResponse authResponse = authMapper.toAuthResponse(user);
         authResponse.setAccessToken(newAccessToken);
         return authResponse;
     }
@@ -150,7 +153,7 @@ public class AuthServiceImpl implements AuthService {
 
         setRefreshTokenCookie(response, refreshToken);
 
-        AuthResponse authResponse = authMapper.toAuthResponse(customUserDetails);
+        AuthResponse authResponse = authMapper.toAuthResponse(user);
         authResponse.setAccessToken(accessToken);
         return authResponse;
     }
