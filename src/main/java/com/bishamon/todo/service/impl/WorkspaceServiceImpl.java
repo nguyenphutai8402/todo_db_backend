@@ -14,6 +14,7 @@ import com.bishamon.todo.mapper.WorkspaceMapper;
 import com.bishamon.todo.repository.UserRepository;
 import com.bishamon.todo.repository.WorkspaceMemberRepository;
 import com.bishamon.todo.repository.WorkspaceRepository;
+import com.bishamon.todo.service.CloudinaryService;
 import com.bishamon.todo.service.ImageService;
 import com.bishamon.todo.service.WorkspaceService;
 import lombok.AccessLevel;
@@ -22,6 +23,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -35,12 +37,13 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     WorkspaceMemberRepository workspaceMemberRepository;
     WorkspaceMapper workspaceMapper;
     ImageService imageService;
+    CloudinaryService cloudinaryService;
 
     @Override
     @Transactional
     public WorkspaceDetailResponse createWorkspace(WorkspaceRequest workSpaceRequest, Long currentUserId) {
         User currentUser = userRepository.findById(currentUserId)
-                .orElseThrow(()-> new AppException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         if (workspaceRepository.existsByCreatedByAndName(currentUser, workSpaceRequest.getName())) {
             throw new AppException(ErrorCode.WORKSPACE_NAME_DUPLICATE);
         }
@@ -71,14 +74,14 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     @Override
     public WorkspaceDetailResponse updateWorkspace(
             Long workspaceId, Long currentUserId, WorkspaceRequest workspaceRequest) {
-        Workspace workspace = workspaceRepository.findById(workspaceId).
-                orElseThrow(() -> new AppException(ErrorCode.WORKSPACE_NOT_FOUND));
+        Workspace workspace = workspaceRepository.findById(workspaceId)
+                .orElseThrow(() -> new AppException(ErrorCode.WORKSPACE_NOT_FOUND));
 
-        WorkspaceMember workspaceMember = workspaceMemberRepository.findByWorkspaceIdAndUserId(workspaceId, currentUserId).
-                orElseThrow(() -> new AppException(ErrorCode.USER_NOT_A_MEMBER));
+        WorkspaceMember workspaceMember = workspaceMemberRepository.findByWorkspaceIdAndUserId(workspaceId, currentUserId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_A_MEMBER));
 
-        if(workspaceMember.getContextualRole() != ContextualRole.OWNER &&
-        workspaceMember.getContextualRole() != ContextualRole.MANAGER){
+        if (workspaceMember.getContextualRole() != ContextualRole.OWNER &&
+                workspaceMember.getContextualRole() != ContextualRole.MANAGER) {
             throw new AppException(ErrorCode.FORBIDDEN);
         }
 
@@ -89,7 +92,26 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         }
 
         workspaceMapper.updateWorkspace(workspace, workspaceRequest);
-        Workspace updateWorkspace= workspaceRepository.save(workspace);
+        Workspace updateWorkspace = workspaceRepository.save(workspace);
         return workspaceMapper.toWorkspaceDetailResponse(updateWorkspace);
+    }
+
+    @Override
+    public WorkspaceDetailResponse updateWorkspaceLogo(Long workspaceId, Long currentUserId, MultipartFile file) {
+        Workspace workspace = workspaceRepository.findById(workspaceId)
+                .orElseThrow(() -> new AppException(ErrorCode.WORKSPACE_NOT_FOUND));
+
+        WorkspaceMember workspaceMember = workspaceMemberRepository.findByWorkspaceIdAndUserId(workspaceId, currentUserId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_A_MEMBER));
+
+        if (workspaceMember.getContextualRole() != ContextualRole.OWNER &&
+                workspaceMember.getContextualRole() != ContextualRole.MANAGER) {
+            throw new AppException(ErrorCode.FORBIDDEN);
+        }
+
+        String logoUrl = cloudinaryService.uploadWorkspaceLogo(file, workspaceId);
+        workspace.setLogoUrl(logoUrl);
+        workspaceRepository.save(workspace);
+        return workspaceMapper.toWorkspaceDetailResponse(workspace);
     }
 }

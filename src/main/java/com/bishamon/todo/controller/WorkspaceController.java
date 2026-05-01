@@ -12,9 +12,11 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -37,7 +39,7 @@ public class WorkspaceController {
 
     @GetMapping("/my")
     public ResponseEntity<ApiResponse<List<WorkspaceSummaryResponse>>> getMy(
-            @AuthenticationPrincipal CustomUserDetails userDetails){
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
         return ResponseEntity.ok(ApiResponse.ok(workspaceService.getMyWorkspaces(userDetails.getId())));
     }
 
@@ -45,9 +47,23 @@ public class WorkspaceController {
     public ResponseEntity<ApiResponse<WorkspaceDetailResponse>> update(
             @PathVariable Long workspaceId,
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @Valid @RequestBody WorkspaceRequest workspaceRequest){
+            @Valid @RequestBody WorkspaceRequest workspaceRequest) {
         WorkspaceDetailResponse workspaceDetailResponse = workspaceService.updateWorkspace(
                 workspaceId, userDetails.getId(), workspaceRequest);
+        return ResponseEntity.ok(ApiResponse.ok(workspaceDetailResponse));
+    }
+
+    @PutMapping(
+            value = "/{workspaceId}/logo",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public ResponseEntity<ApiResponse<WorkspaceDetailResponse>> updateLogo(
+            @PathVariable Long workspaceId,
+            @RequestPart("file") MultipartFile file,
+            @AuthenticationPrincipal CustomUserDetails userDetail
+    ) {
+        WorkspaceDetailResponse workspaceDetailResponse =
+                workspaceService.updateWorkspaceLogo(workspaceId, userDetail.getId(), file);
         return ResponseEntity.ok(ApiResponse.ok(workspaceDetailResponse));
     }
 }

@@ -32,6 +32,14 @@ public enum ErrorCode {
     // ============ AUTHORIZATION ============
     UNAUTHORIZED(HttpStatus.FORBIDDEN, "Invalid email or password"),
 
+    // ============ FILE ============
+    FILE_EMPTY(HttpStatus.BAD_REQUEST, "File cannot be empty"),
+    FILE_INVALID_TYPE(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "Only accept image files: JPEG, PNG, WEBP, GIF"),
+    FILE_SIZE_EXCEEDED(HttpStatus.BAD_REQUEST, "File size must not exceed 5MB"),
+    FILE_UPLOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "File upload failed, please try again"),
+    FILE_DELETE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "File deletion failed"),
+    FILE_INVALID_URL(HttpStatus.BAD_REQUEST, "Invalid file URL"),
+
     // ============ USER ============
     PASSWORD_MISMATCH(HttpStatus.BAD_REQUEST, "Password and confirm password do not match"),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "User not found"),

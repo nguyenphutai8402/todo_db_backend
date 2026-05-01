@@ -1,5 +1,6 @@
 package com.bishamon.todo.config;
 
+import com.bishamon.todo.config.properties.CloudinaryProperties;
 import com.cloudinary.Cloudinary;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -12,24 +13,17 @@ import java.util.Map;
 
 @Configuration
 @RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE)
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CloudinaryConfig {
-    @Value("${cloudinary.cloud-name}")
-    String cloudName;
-
-    @Value("${cloudinary.api-key}")
-    String apiKey;
-
-    @Value("${cloudinary.api-secret}")
-    String apiSecret;
+    CloudinaryProperties cloudinaryProperties;
 
     @Bean
     public Cloudinary cloudinary(){
 
         return new Cloudinary(Map.of(
-                "cloud_name", cloudName,
-                "api_key", apiKey,
-                "api_secret", apiSecret
+                "cloud_name", cloudinaryProperties.getCloudName(),
+                "api_key", cloudinaryProperties.getApiKey(),
+                "api_secret", cloudinaryProperties.getApiSecret()
         ));
     }
 }
