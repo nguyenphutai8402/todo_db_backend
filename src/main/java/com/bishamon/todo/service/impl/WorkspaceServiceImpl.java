@@ -114,4 +114,19 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         workspaceRepository.save(workspace);
         return workspaceMapper.toWorkspaceDetailResponse(workspace);
     }
+
+    @Override
+    public void deleteWorkspace(Long workspaceId, Long currentUserId) {
+        Workspace workspace = workspaceRepository.findById(workspaceId)
+                .orElseThrow(() -> new AppException(ErrorCode.WORKSPACE_NOT_FOUND));
+
+        WorkspaceMember workspaceMember = workspaceMemberRepository.findByWorkspaceIdAndUserId(workspaceId, currentUserId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_A_MEMBER));
+
+        if(workspaceMember.getContextualRole() != ContextualRole.OWNER){
+            throw new AppException(ErrorCode.FORBIDDEN);
+        }
+
+        workspaceRepository.delete(workspace);
+    }
 }

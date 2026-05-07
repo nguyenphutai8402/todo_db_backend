@@ -66,4 +66,13 @@ public class WorkspaceController {
                 workspaceService.updateWorkspaceLogo(workspaceId, userDetail.getId(), file);
         return ResponseEntity.ok(ApiResponse.ok(workspaceDetailResponse));
     }
+
+    @DeleteMapping("/{workspaceId}")
+    public ResponseEntity<ApiResponse<Void>> delete(
+            @PathVariable Long workspaceId,
+            @AuthenticationPrincipal CustomUserDetails userDetail
+    ){
+        workspaceService.deleteWorkspace(workspaceId, userDetail.getId());
+        return ResponseEntity.ok(ApiResponse.success(SuccessCode.OK));
+    }
 }

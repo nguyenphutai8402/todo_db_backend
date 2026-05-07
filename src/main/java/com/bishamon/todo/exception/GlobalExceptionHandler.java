@@ -119,11 +119,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public ResponseEntity<ApiResponse<Void>> handleMaxUploadSize(
             MaxUploadSizeExceededException ex) {
-        ErrorCode errorCode = ErrorCode.FILE_SIZE_EXCEEDED;
         log.error("MaxUploadSizeExceeded: {}", ex.getMessage());
-
         return ResponseEntity
-                .status(errorCode.getHttpStatus())
+                .status(HttpStatus.BAD_REQUEST)
                 .body(ApiResponse.error(ErrorCode.FILE_SIZE_EXCEEDED));
     }
 

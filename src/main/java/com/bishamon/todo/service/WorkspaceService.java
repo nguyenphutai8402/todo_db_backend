@@ -14,4 +14,5 @@ public interface WorkspaceService {
             Long workspaceId,  Long currentUserId, WorkspaceRequest workspaceRequest);
     WorkspaceDetailResponse updateWorkspaceLogo(
             Long workspaceId, Long currentUserId, MultipartFile file);
+    void deleteWorkspace(Long workspaceId, Long currentUserId);
 }
