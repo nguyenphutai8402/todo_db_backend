@@ -1,5 +1,5 @@
 package com.bishamon.todo.enumeration;
 
-public enum Visibility {
+public enum WorkspaceVisibility {
     PRIVATE, PUBLIC
 }

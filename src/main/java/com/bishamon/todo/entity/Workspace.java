@@ -1,6 +1,6 @@
 package com.bishamon.todo.entity;
 
-import com.bishamon.todo.enumeration.Visibility;
+import com.bishamon.todo.enumeration.WorkspaceVisibility;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -36,7 +36,7 @@ public class Workspace extends BaseEntity {
     @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    Visibility visibility = Visibility.PRIVATE;
+    WorkspaceVisibility workspaceVisibility = WorkspaceVisibility.PRIVATE;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by", nullable = false)

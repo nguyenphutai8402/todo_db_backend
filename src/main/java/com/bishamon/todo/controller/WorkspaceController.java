@@ -3,6 +3,7 @@ package com.bishamon.todo.controller;
 import com.bishamon.todo.dto.request.workspace.WorkspaceRequest;
 import com.bishamon.todo.dto.response.common.ApiResponse;
 import com.bishamon.todo.dto.response.workspace.WorkspaceDetailResponse;
+import com.bishamon.todo.dto.response.workspace.WorkspaceResponse;
 import com.bishamon.todo.dto.response.workspace.WorkspaceSummaryResponse;
 import com.bishamon.todo.enumeration.code.SuccessCode;
 import com.bishamon.todo.security.user.CustomUserDetails;
@@ -28,10 +29,10 @@ public class WorkspaceController {
     WorkspaceService workspaceService;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<WorkspaceDetailResponse>> create(
+    public ResponseEntity<ApiResponse<WorkspaceResponse>> create(
             @RequestBody @Valid WorkspaceRequest workspaceRequest,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
-        WorkspaceDetailResponse workspaceResponse = workspaceService.createWorkspace(workspaceRequest, userDetails.getId());
+        WorkspaceResponse workspaceResponse = workspaceService.createWorkspace(workspaceRequest, userDetails.getId());
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(ApiResponse.success(SuccessCode.CREATED, workspaceResponse));
@@ -44,27 +45,27 @@ public class WorkspaceController {
     }
 
     @PatchMapping("/{workspaceId}")
-    public ResponseEntity<ApiResponse<WorkspaceDetailResponse>> update(
+    public ResponseEntity<ApiResponse<WorkspaceResponse>> update(
             @PathVariable Long workspaceId,
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @Valid @RequestBody WorkspaceRequest workspaceRequest) {
-        WorkspaceDetailResponse workspaceDetailResponse = workspaceService.updateWorkspace(
+        WorkspaceResponse workspaceResponse = workspaceService.updateWorkspace(
                 workspaceId, userDetails.getId(), workspaceRequest);
-        return ResponseEntity.ok(ApiResponse.ok(workspaceDetailResponse));
+        return ResponseEntity.ok(ApiResponse.ok(workspaceResponse));
     }
 
     @PutMapping(
             value = "/{workspaceId}/logo",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
-    public ResponseEntity<ApiResponse<WorkspaceDetailResponse>> updateLogo(
+    public ResponseEntity<ApiResponse<WorkspaceResponse>> updateLogo(
             @PathVariable Long workspaceId,
             @RequestPart("file") MultipartFile file,
             @AuthenticationPrincipal CustomUserDetails userDetail
     ) {
-        WorkspaceDetailResponse workspaceDetailResponse =
+        WorkspaceResponse workspaceResponse =
                 workspaceService.updateWorkspaceLogo(workspaceId, userDetail.getId(), file);
-        return ResponseEntity.ok(ApiResponse.ok(workspaceDetailResponse));
+        return ResponseEntity.ok(ApiResponse.ok(workspaceResponse));
     }
 
     @DeleteMapping("/{workspaceId}")

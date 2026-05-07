@@ -2,6 +2,7 @@ package com.bishamon.todo.mapper;
 
 import com.bishamon.todo.dto.request.workspace.WorkspaceRequest;
 import com.bishamon.todo.dto.response.workspace.WorkspaceDetailResponse;
+import com.bishamon.todo.dto.response.workspace.WorkspaceResponse;
 import com.bishamon.todo.dto.response.workspace.WorkspaceSummaryResponse;
 import com.bishamon.todo.entity.Workspace;
 import com.bishamon.todo.entity.WorkspaceMember;
@@ -14,7 +15,7 @@ import java.util.Set;
         uses = {UserMapper.class, WorkspaceMemberMapper.class}
 )
 public interface WorkspaceMapper {
-    // ============ REQUEST ============
+    // REQUEST
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "logoUrl", ignore = true)
     @Mapping(target = "createdBy", ignore = true)
@@ -32,10 +33,13 @@ public interface WorkspaceMapper {
     @Mapping(target = "updatedAt", ignore = true)
     void updateWorkspace(@MappingTarget Workspace workspace, WorkspaceRequest request);
 
-    // ============ RESPONSE============
-    @Mapping(target = "memberCount", source = "members", qualifiedByName = "countMember")
+    // RESPONSE
+    WorkspaceResponse toWorkspaceResponse(Workspace workspace);
+
+    @Mapping(target = "totalMember", source = "members", qualifiedByName = "countMember")
     WorkspaceDetailResponse toWorkspaceDetailResponse(Workspace workspace);
 
+    @Mapping(target = "totalMember", source = "members", qualifiedByName = "countMember")
     WorkspaceSummaryResponse toWorkspaceSummaryResponse(Workspace workspace);
     List<WorkspaceSummaryResponse> toWorkspaceSummaryResponseList(List<Workspace> workspaces);
 

@@ -1,6 +1,6 @@
 package com.bishamon.todo.dto.request.workspace;
 
-import com.bishamon.todo.enumeration.Visibility;
+import com.bishamon.todo.enumeration.WorkspaceVisibility;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -18,5 +18,5 @@ public class WorkspaceRequest {
     @Size(max = 1000, message = "Description must not exceed 1000 characters")
     private String description;
 
-    private Visibility visibility;
+    private WorkspaceVisibility workspaceVisibility;
 }

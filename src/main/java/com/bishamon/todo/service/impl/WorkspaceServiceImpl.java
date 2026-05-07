@@ -1,14 +1,14 @@
 package com.bishamon.todo.service.impl;
 
 import com.bishamon.todo.dto.request.workspace.WorkspaceRequest;
-import com.bishamon.todo.dto.response.workspace.WorkspaceDetailResponse;
+import com.bishamon.todo.dto.response.workspace.WorkspaceResponse;
 import com.bishamon.todo.dto.response.workspace.WorkspaceSummaryResponse;
 import com.bishamon.todo.entity.User;
 import com.bishamon.todo.entity.Workspace;
 import com.bishamon.todo.entity.WorkspaceMember;
 import com.bishamon.todo.enumeration.ContextualRole;
+import com.bishamon.todo.enumeration.WorkspaceVisibility;
 import com.bishamon.todo.enumeration.code.ErrorCode;
-import com.bishamon.todo.enumeration.Visibility;
 import com.bishamon.todo.exception.AppException;
 import com.bishamon.todo.mapper.WorkspaceMapper;
 import com.bishamon.todo.repository.UserRepository;
@@ -41,7 +41,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
     @Override
     @Transactional
-    public WorkspaceDetailResponse createWorkspace(WorkspaceRequest workSpaceRequest, Long currentUserId) {
+    public WorkspaceResponse createWorkspace(WorkspaceRequest workSpaceRequest, Long currentUserId) {
         User currentUser = userRepository.findById(currentUserId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         if (workspaceRepository.existsByCreatedByAndName(currentUser, workSpaceRequest.getName())) {
@@ -49,7 +49,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         }
 
         Workspace workspace = workspaceMapper.toWorkspace(workSpaceRequest);
-        if (workspace.getVisibility() == null) workspace.setVisibility(Visibility.PRIVATE);
+        if (workspace.getWorkspaceVisibility() == null) workspace.setWorkspaceVisibility(WorkspaceVisibility.PRIVATE);
 
         if (workspace.getLogoUrl() == null) workspace.setLogoUrl(imageService.generateImageUrl(workspace.getName()));
         workspace.setCreatedBy(currentUser);
@@ -62,7 +62,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
         Workspace savedWorkspace = workspaceRepository.save(workspace);
 
-        return workspaceMapper.toWorkspaceDetailResponse(savedWorkspace);
+        return workspaceMapper.toWorkspaceResponse(savedWorkspace);
     }
 
     @Override
@@ -74,7 +74,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
     @Override
     @Transactional
-    public WorkspaceDetailResponse updateWorkspace(
+    public WorkspaceResponse updateWorkspace(
             Long workspaceId, Long currentUserId, WorkspaceRequest workspaceRequest) {
         Workspace workspace = workspaceRepository.findById(workspaceId)
                 .orElseThrow(() -> new AppException(ErrorCode.WORKSPACE_NOT_FOUND));
@@ -95,12 +95,12 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
         workspaceMapper.updateWorkspace(workspace, workspaceRequest);
         Workspace updateWorkspace = workspaceRepository.save(workspace);
-        return workspaceMapper.toWorkspaceDetailResponse(updateWorkspace);
+        return workspaceMapper.toWorkspaceResponse(updateWorkspace);
     }
 
     @Override
     @Transactional
-    public WorkspaceDetailResponse updateWorkspaceLogo(Long workspaceId, Long currentUserId, MultipartFile file) {
+    public WorkspaceResponse updateWorkspaceLogo(Long workspaceId, Long currentUserId, MultipartFile file) {
         Workspace workspace = workspaceRepository.findById(workspaceId)
                 .orElseThrow(() -> new AppException(ErrorCode.WORKSPACE_NOT_FOUND));
 
@@ -115,7 +115,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         String logoUrl = cloudinaryService.uploadWorkspaceLogo(file, workspaceId);
         workspace.setLogoUrl(logoUrl);
         workspaceRepository.save(workspace);
-        return workspaceMapper.toWorkspaceDetailResponse(workspace);
+        return workspaceMapper.toWorkspaceResponse(workspace);
     }
 
     @Override

@@ -51,6 +51,10 @@ public enum ErrorCode {
     WORKSPACE_NOT_FOUND(HttpStatus.NOT_FOUND, "Workspace not found"),
     WORKSPACE_NAME_DUPLICATE(HttpStatus.CONFLICT, "This workspace already exists with this user."),
 
+    // ============ WORKSPACE ============
+    BOARD_NOT_FOUND(HttpStatus.NOT_FOUND, "Board not found"),
+    BOARD_NAME_DUPLICATE(HttpStatus.CONFLICT, "This board already exists with this user."),
+
     // ============ RESOURCE ============
     RESOURCE_NOT_FOUND(HttpStatus.NOT_FOUND, "Resource not found"),
     RESOURCE_ALREADY_EXISTS(HttpStatus.CONFLICT, "Resource already exists"),

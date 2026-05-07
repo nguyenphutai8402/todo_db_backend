@@ -29,6 +29,7 @@ public class BoardMember {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(name = "contextual_role", nullable = false, length = 20)
     private ContextualRole contextualRole = ContextualRole.MEMBER;
