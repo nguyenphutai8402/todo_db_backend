@@ -66,12 +66,14 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<WorkspaceSummaryResponse> getMyWorkspaces(Long currentUserId) {
         List<Workspace> listWorkspace = workspaceRepository.findAllByUserId(currentUserId);
         return workspaceMapper.toWorkspaceSummaryResponseList(listWorkspace);
     }
 
     @Override
+    @Transactional
     public WorkspaceDetailResponse updateWorkspace(
             Long workspaceId, Long currentUserId, WorkspaceRequest workspaceRequest) {
         Workspace workspace = workspaceRepository.findById(workspaceId)
@@ -97,6 +99,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     }
 
     @Override
+    @Transactional
     public WorkspaceDetailResponse updateWorkspaceLogo(Long workspaceId, Long currentUserId, MultipartFile file) {
         Workspace workspace = workspaceRepository.findById(workspaceId)
                 .orElseThrow(() -> new AppException(ErrorCode.WORKSPACE_NOT_FOUND));
@@ -116,6 +119,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     }
 
     @Override
+    @Transactional
     public void deleteWorkspace(Long workspaceId, Long currentUserId) {
         Workspace workspace = workspaceRepository.findById(workspaceId)
                 .orElseThrow(() -> new AppException(ErrorCode.WORKSPACE_NOT_FOUND));
